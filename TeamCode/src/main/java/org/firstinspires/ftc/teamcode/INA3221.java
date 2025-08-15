@@ -25,11 +25,44 @@ public class INA3221 extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
     public enum CHANNEL {
         CHANNEL_1,
         CHANNEL_2,
-        CHANNEL_3;
+        CHANNEL_3
     }
 
     public enum AVG_SAMPLES {
+        AVG_1,
+        AVG_4,
+        AVG_16,
+        AVG_64,
+        AVG_128,
+        AVG_256,
+        AVG_512,
+        AVG_1024
+    }
 
+    public enum CONVERSION_TIMES {
+        _140_US,
+        _204_US,
+        _322_US,
+        _588_US,
+        _1_1_MS,
+        _2_116_MS,
+        _4_156_MS,
+        _8_244_MS
+    }
+
+    public enum MODES {
+        POWER_DOWN(0b000),
+        SHUNT_VOLTAGE_SINGLE(0b001),
+        BUS_VOLTAGE_SINGLE(0b10),
+        SHUNT_AND_BUS_SINGLE(0b011),
+        SHUNT_VOLTAGE_CONTINOUS(0b101),
+        BUS_VOLTAGE_CONTINUOUS(0b110),
+        BUS_SHUNT_CONTINUOUS(0b111);
+        public int value;
+
+        MODES(int value) {
+            this.value = value;
+        }
     }
 
     public INA3221(I2cDeviceSynchSimple deviceClient, boolean deviceClientIsOwned)
@@ -86,6 +119,62 @@ public class INA3221 extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
         }
 
         setConfiguration(configEnabledChannels);
+    }
+
+    public void setAvarageSamples(AVG_SAMPLES avarageSamples) {
+        writeInt(RegisterMaps.CONFIGURATION, avarageSamples.ordinal() << 9);
+    }
+
+    public void setBusVoltageConversionTime(CONVERSION_TIMES conversionTime) {
+        writeInt(RegisterMaps.CONFIGURATION, conversionTime.ordinal() << 6);
+    }
+
+    public void setShuntVoltageConversionTime(CONVERSION_TIMES conversionTime) {
+        writeInt(RegisterMaps.CONFIGURATION, conversionTime.ordinal() << 3);
+    }
+
+    public void setMode(MODES mode) {
+        writeInt(RegisterMaps.CONFIGURATION, mode.value);
+    }
+
+    double getShuntVoltage(CHANNEL channel) {
+        RegisterMaps reg;
+
+        switch(channel) {
+            case CHANNEL_1:
+                reg = RegisterMaps.SHUNT_VOLTAGE_CH1;
+                break;
+            case CHANNEL_2:
+                reg = RegisterMaps.SHUNT_VOLTAGE_CH2;
+                break;
+            case CHANNEL_3:
+                reg = RegisterMaps.SHUNT_VOLTAGE_CH3;
+                break;
+            default:
+                return 0.0;
+        }
+
+        return (readInt(reg) >> 3) * 40e-6;
+    }
+
+    double getBusVoltage(CHANNEL channel) {
+        RegisterMaps reg;
+
+        switch (channel) {
+            case CHANNEL_1:
+                reg = RegisterMaps.BUS_VOLTAGE_CH1;
+                break;
+            case CHANNEL_2:
+                reg = RegisterMaps.BUS_VOLTAGE_CH2;
+                break;
+            case CHANNEL_3:
+                reg = RegisterMaps.BUS_VOLTAGE_CH3;
+                break;
+            default:
+                return 0.0;
+        }
+
+        return (readInt(reg) >> 3) * 8e-3;
     }
 
     private int getConfiguration() {
