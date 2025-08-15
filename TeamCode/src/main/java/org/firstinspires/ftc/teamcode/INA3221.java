@@ -22,6 +22,8 @@ public class INA3221 extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
 
     private final Byte I2C_ADDRESS_GND = 0x40;
 
+    double[] shuntResistors = {0.1, 0.1, 0.1};
+
     public enum CHANNEL {
         CHANNEL_1,
         CHANNEL_2,
@@ -91,6 +93,10 @@ public class INA3221 extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
 
     public void reset() {
         setConfiguration((1 << 15));
+    }
+
+    public boolean isConnected() {
+        return (readInt(RegisterMaps.DIE_ID) == 0xFF);
     }
 
     public void enableChannel(CHANNEL channel, boolean enabled) {
@@ -175,6 +181,12 @@ public class INA3221 extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
         }
 
         return (readInt(reg) >> 3) * 8e-3;
+    }
+
+    public double getCurrent(CHANNEL channel) {
+        double shuntVoltage = getShuntVoltage(channel);
+
+        return shuntVoltage / shuntResistors[channel.ordinal()];
     }
 
     private int getConfiguration() {
