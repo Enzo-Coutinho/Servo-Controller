@@ -29,23 +29,18 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
+import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name="Servo-Controller", group="Linear OpMode")
-public class ServoControllerExampler extends LinearOpMode {
-
-    // Declare OpMode members for each of the 4 motors.
-    private ElapsedTime runtime = new ElapsedTime();
+public class ServoControllerExample extends LinearOpMode {
     INA3221 servoController;
 
     @Override
     public void runOpMode() {
         servoController = hardwareMap.get(INA3221.class, "servoController");
+        Servo servoOnChannel1 = hardwareMap.get(Servo.class, "servo1");
         // run until the end of the match (driver presses STOP)
 
         do {
@@ -56,11 +51,25 @@ public class ServoControllerExampler extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
+
+            if(gamepad1.a) servoOnChannel1.setPosition(1);
+            else servoOnChannel1.setPosition(0);
+
             double[] busVoltage = new double[3];
+            double[] shuntVoltage = new double[3];
+            double[] current = new double[3];
             for(INA3221.CHANNEL channel : INA3221.CHANNEL.values())
             {
-                double busVoltage[channel] = servoController.getBusVoltage(channel);
+                int channelInt = channel.ordinal();
+                busVoltage[channelInt] = servoController.getBusVoltage(channel);
+                shuntVoltage[channelInt] = servoController.getShuntVoltage(channel);
+                current[channelInt] = servoController.getCurrent(channel);
+
+                telemetry.addData("Bus Voltage", " (%d): %.2f", channelInt + 1, busVoltage[channelInt]);
+                telemetry.addData("Shunt Voltage", " (%d): %.2f", channelInt + 1, shuntVoltage[channelInt]);
+                telemetry.addData("Current", " (%d): %.2f", channelInt + 1, current[channelInt]);
             }
+            telemetry.update();
         }
     }
 }
