@@ -32,23 +32,30 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name="Servo-Controller", group="Linear OpMode")
 public class ServoControllerExample extends LinearOpMode {
     INA3221 servoController;
-
+    ElapsedTime timer = new ElapsedTime();
     @Override
     public void runOpMode() {
         servoController = hardwareMap.get(INA3221.class, "servoController");
         Servo servoOnChannel1 = hardwareMap.get(Servo.class, "servo1");
         // run until the end of the match (driver presses STOP)
 
-        do {
-            servoController.reset();
-            sleep(200);
-        } while (!servoController.isConnected());
+        //servoController.reset();
 
         waitForStart();
+
+        while(!servoController.isConnected()) {
+            telemetry.addData("Connection status", servoController.getDeviceId());
+            telemetry.update();
+            if(gamepad1.a) break;
+        }
+
+
+        timer.reset();
 
         while (opModeIsActive()) {
 
@@ -69,6 +76,7 @@ public class ServoControllerExample extends LinearOpMode {
                 telemetry.addData("Shunt Voltage", " (%d): %.2f", channelInt + 1, shuntVoltage[channelInt]);
                 telemetry.addData("Current", " (%d): %.2f", channelInt + 1, current[channelInt]);
             }
+            telemetry.addData("Elapsed Time", timer.time());
             telemetry.update();
         }
     }

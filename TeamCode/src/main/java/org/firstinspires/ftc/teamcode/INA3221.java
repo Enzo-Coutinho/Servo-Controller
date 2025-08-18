@@ -18,7 +18,7 @@ import java.nio.ByteOrder;
         xmlTag = "ServoControllerINA3221",
         description ="ServoController with INA3221 for detects grap"
 )
-public class INA3221 extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
+public class  INA3221 extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
 
     private final Byte I2C_ADDRESS_GND = 0x40;
 
@@ -77,7 +77,7 @@ public class INA3221 extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
 
     @Override
     protected boolean doInitialize() {
-        ((LynxI2cDeviceSynch)(deviceClient)).setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
+        ((LynxI2cDeviceSynch)(deviceClient)).setBusSpeed(LynxI2cDeviceSynch.BusSpeed.STANDARD_100K);
         return true;
     }
 
@@ -96,7 +96,11 @@ public class INA3221 extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
     }
 
     public boolean isConnected() {
-        return (readInt(RegisterMaps.DIE_ID) == 0xFF);
+        return (readInt(RegisterMaps.MANUFACTURER_ID) == 0xFE);
+    }
+
+    public int getDeviceId() {
+        return readInt(RegisterMaps.MANUFACTURER_ID);
     }
 
     public void enableChannel(CHANNEL channel, boolean enabled) {
