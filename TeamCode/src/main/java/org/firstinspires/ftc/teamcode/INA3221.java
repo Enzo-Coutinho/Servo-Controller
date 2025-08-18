@@ -207,6 +207,6 @@ public class  INA3221 extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
     }
 
     private int readInt(RegisterMaps reg){
-        return unsignedShortToInt(byteArrayToShort(deviceClient.read(reg.getAddress(),2), 0, ByteOrder.BIG_ENDIAN));
+        return unsignedShortToInt(byteArrayToShort(deviceClient.read(reg.getAddress(),2), ByteOrder.BIG_ENDIAN));
     }
 }
