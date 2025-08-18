@@ -45,11 +45,11 @@ public class ServoControllerExample extends LinearOpMode {
         Servo servoOnChannel1 = hardwareMap.get(Servo.class, "servo1");
         // run until the end of the match (driver presses STOP)
 
-        servoController.reset();
+        //servoController.reset();
 
         waitForStart();
 
-        while(!servoController.isConnected()) {
+        while(!servoController.isConnected() && opModeIsActive()) {
             telemetry.addData("Connection status", servoController.getDeviceId());
             telemetry.update();
             if(gamepad1.a) break;

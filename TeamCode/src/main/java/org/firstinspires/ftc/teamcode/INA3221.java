@@ -78,7 +78,7 @@ public class  INA3221 extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
 
     @Override
     protected boolean doInitialize() {
-        ((LynxI2cDeviceSynch)(deviceClient)).setBusSpeed(LynxI2cDeviceSynch.BusSpeed.STANDARD_100K);
+        ((LynxI2cDeviceSynch)(deviceClient)).setBusSpeed(LynxI2cDeviceSynch.BusSpeed.FAST_400K);
         return true;
     }
 
@@ -97,7 +97,7 @@ public class  INA3221 extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
     }
 
     public boolean isConnected() {
-        return (readInt(RegisterMaps.MANUFACTURER_ID) == 0xFE);
+        return (readInt(RegisterMaps.MANUFACTURER_ID) == 0x5449);
     }
 
     public int getDeviceId() {
