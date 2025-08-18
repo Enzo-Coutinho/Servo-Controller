@@ -135,15 +135,15 @@ public class  INA3221 extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
     }
 
     public void setAvarageSamples(AVG_SAMPLES avarageSamples) {
-        writeInt(RegisterMaps.CONFIGURATION, avarageSamples.ordinal() << 9);
+        setConfiguration(avarageSamples.ordinal() << 9);
     }
 
     public void setBusVoltageConversionTime(CONVERSION_TIMES conversionTime) {
-        writeInt(RegisterMaps.CONFIGURATION, conversionTime.ordinal() << 6);
+        setConfiguration(conversionTime.ordinal() << 6);
     }
 
     public void setShuntVoltageConversionTime(CONVERSION_TIMES conversionTime) {
-        writeInt(RegisterMaps.CONFIGURATION, conversionTime.ordinal() << 3);
+        setConfiguration(conversionTime.ordinal() << 3);
     }
 
     public void setMode(MODES mode) {
@@ -201,10 +201,10 @@ public class  INA3221 extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
     }
 
     private void setConfiguration(int configuration) {
-        writeInt(RegisterMaps.CONFIGURATION, configuration);
+        writeInt(RegisterMaps.CONFIGURATION, (short) configuration);
     }
 
-    private void writeInt(final RegisterMaps reg, int i){
+    private void writeInt(final RegisterMaps reg, short i){
         deviceClient.write(reg.getAddress(), TypeConversion.intToByteArray(i, ByteOrder.BIG_ENDIAN));
     }
 
