@@ -147,7 +147,7 @@ public class  INA3221 extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
     }
 
     public void setMode(MODES mode) {
-        writeInt(RegisterMaps.CONFIGURATION, mode.value);
+        setConfiguration(mode.value);
     }
 
     double getShuntVoltage(CHANNEL channel) {
