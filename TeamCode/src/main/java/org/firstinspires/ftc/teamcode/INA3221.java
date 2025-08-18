@@ -1,10 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
-import static com.qualcomm.robotcore.util.TypeConversion.byteArrayToInt;
 import static com.qualcomm.robotcore.util.TypeConversion.byteArrayToShort;
 import static com.qualcomm.robotcore.util.TypeConversion.unsignedShortToInt;
 
-import com.qualcomm.hardware.broadcom.BroadcomColorSensor;
 import com.qualcomm.hardware.lynx.LynxI2cDeviceSynch;
 import com.qualcomm.robotcore.hardware.I2cAddr;
 import com.qualcomm.robotcore.hardware.I2cDeviceSynchDevice;
@@ -63,7 +61,7 @@ public class  INA3221 extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
         SHUNT_VOLTAGE_CONTINOUS(0b101),
         BUS_VOLTAGE_CONTINUOUS(0b110),
         BUS_SHUNT_CONTINUOUS(0b111);
-        public int value;
+        public final int value;
 
         MODES(int value) {
             this.value = value;
