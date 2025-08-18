@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -44,7 +45,7 @@ public class ServoControllerExample extends LinearOpMode {
         Servo servoOnChannel1 = hardwareMap.get(Servo.class, "servo1");
         // run until the end of the match (driver presses STOP)
 
-        //servoController.reset();
+        servoController.reset();
 
         waitForStart();
 
