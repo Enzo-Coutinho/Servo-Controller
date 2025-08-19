@@ -93,15 +93,11 @@ public class  INA3221 extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
     }
 
     public void reset() {
-        setConfiguration((1 << 15));
+        setConfiguration(getConfiguration() | (1 << 15));
     }
 
     public boolean isConnected() {
         return (readInt(RegisterMaps.MANUFACTURER_ID) == 0x5449);
-    }
-
-    public int getDeviceId() {
-        return readInt(RegisterMaps.MANUFACTURER_ID);
     }
 
     public void enableChannel(CHANNEL channel, boolean enabled) {
@@ -148,7 +144,7 @@ public class  INA3221 extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
         setConfiguration(mode.value);
     }
 
-    double getShuntVoltage(CHANNEL channel) {
+    private double getShuntVoltage(CHANNEL channel) {
         RegisterMaps reg;
 
         switch(channel) {
@@ -168,7 +164,7 @@ public class  INA3221 extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
         return (readInt(reg) >> 3) * 40e-6;
     }
 
-    double getBusVoltage(CHANNEL channel) {
+    public double getBusVoltage(CHANNEL channel) {
         RegisterMaps reg;
 
         switch (channel) {
@@ -203,7 +199,7 @@ public class  INA3221 extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
     }
 
     private void writeInt(final RegisterMaps reg, short i){
-        deviceClient.write(reg.getAddress(), TypeConversion.intToByteArray(i, ByteOrder.BIG_ENDIAN));
+        deviceClient.write(reg.getAddress(), TypeConversion.shortToByteArray(i, ByteOrder.BIG_ENDIAN));
     }
 
     private int readInt(RegisterMaps reg){

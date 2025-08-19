@@ -47,18 +47,10 @@ public class ServoControllerExample extends LinearOpMode {
 
         servoController = hardwareMap.get(INA3221.class, "servoController");
         Servo servoOnChannel1 = hardwareMap.get(Servo.class, "servo1");
-        // run until the end of the match (driver presses STOP)
 
-        //servoController.reset();
+        servoController.reset();
 
         waitForStart();
-
-        while(!servoController.isConnected() && opModeIsActive()) {
-            telemetry.addData("Connection status", servoController.getDeviceId());
-            telemetry.update();
-            if(gamepad1.a) break;
-        }
-
 
         timer.reset();
 
@@ -68,20 +60,16 @@ public class ServoControllerExample extends LinearOpMode {
             else servoOnChannel1.setPosition(0);
 
             double[] busVoltage = new double[3];
-            double[] shuntVoltage = new double[3];
             double[] current = new double[3];
             for(INA3221.CHANNEL channel : INA3221.CHANNEL.values())
             {
                 int channelInt = channel.ordinal();
                 busVoltage[channelInt] = servoController.getBusVoltage(channel);
-                shuntVoltage[channelInt] = servoController.getShuntVoltage(channel);
                 current[channelInt] = servoController.getCurrent(channel);
 
                 telemetry.addData("Bus Voltage", " (%d): %.2f", channelInt + 1, busVoltage[channelInt]);
-                telemetry.addData("Shunt Voltage", " (%d): %.2f", channelInt + 1, shuntVoltage[channelInt]);
                 telemetry.addData("Current", " (%d): %.2f", channelInt + 1, current[channelInt]);
             }
-            telemetry.addData("Elapsed Time", timer.time());
             telemetry.update();
         }
     }
