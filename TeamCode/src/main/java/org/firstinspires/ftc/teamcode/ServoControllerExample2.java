@@ -33,12 +33,11 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="Servo-Controller", group="Linear OpMode")
-public class ServoControllerExample extends LinearOpMode {
+@TeleOp(name="Servo-Controller 2", group="Linear OpMode")
+public class ServoControllerExample2 extends LinearOpMode {
     ServoController servoController;
     ElapsedTime timer = new ElapsedTime();
     @Override
@@ -53,6 +52,8 @@ public class ServoControllerExample extends LinearOpMode {
         servoController.enableChannel(ServoController.CHANNEL.CHANNEL_2, false);
         servoController.enableChannel(ServoController.CHANNEL.CHANNEL_3, false);
 
+        servoController.setCurrentLimit(ServoController.CHANNEL.CHANNEL_1, 0.5);
+
         waitForStart();
 
         timer.reset();
@@ -62,17 +63,8 @@ public class ServoControllerExample extends LinearOpMode {
             if(gamepad1.a) servoOnChannel1.setPosition(1);
             else servoOnChannel1.setPosition(0);
 
-            double[] busVoltage = new double[3];
-            double[] current = new double[3];
-            for(ServoController.CHANNEL channel : ServoController.CHANNEL.values())
-            {
-                int channelInt = channel.ordinal();
-                busVoltage[channelInt] = servoController.getBusVoltage(channel);
-                current[channelInt] = servoController.getCurrent(channel);
-
-                telemetry.addData("Bus Voltage", " (%d): %.2f", channelInt + 1, busVoltage[channelInt]);
-                telemetry.addData("Current", " (%d): %.2f", channelInt + 1, current[channelInt]);
-            }
+            telemetry.addData("Current (A)", servoController.getCurrent(ServoController.CHANNEL.CHANNEL_1));
+            telemetry.addData("Servo is Close?", servoController.isClose(ServoController.CHANNEL.CHANNEL_1));
             telemetry.update();
         }
     }

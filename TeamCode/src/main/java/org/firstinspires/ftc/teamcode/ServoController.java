@@ -19,11 +19,12 @@ import java.nio.ByteOrder;
         xmlTag = "ServoControllerINA3221",
         description ="ServoController with INA3221 for detects grap"
 )
-public class  INA3221 extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
+public class ServoController extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
 
     private final Byte I2C_ADDRESS_GND = 0x40;
 
-    double[] shuntResistors = {0.1, 0.1, 0.1};
+    private final double[] SHUNT_RESISTORS = {0.1, 0.1, 0.1};
+    private double[] currentLimit = new double[3];
 
     public enum CHANNEL {
         CHANNEL_1,
@@ -68,7 +69,7 @@ public class  INA3221 extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
         }
     }
 
-    public INA3221(I2cDeviceSynchSimple deviceClient, boolean deviceClientIsOwned)
+    public ServoController(I2cDeviceSynchSimple deviceClient, boolean deviceClientIsOwned)
     {
         super(deviceClient, deviceClientIsOwned);
 
@@ -128,40 +129,24 @@ public class  INA3221 extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
         setConfiguration(configEnabledChannels);
     }
 
-    public void setAvarageSamples(AVG_SAMPLES avarageSamples) {
+    private void setAvarageSamples(AVG_SAMPLES avarageSamples) {
         setConfiguration(avarageSamples.ordinal() << 9);
     }
 
-    public void setBusVoltageConversionTime(CONVERSION_TIMES conversionTime) {
+    private void setBusVoltageConversionTime(CONVERSION_TIMES conversionTime) {
         setConfiguration(conversionTime.ordinal() << 6);
     }
 
-    public void setShuntVoltageConversionTime(CONVERSION_TIMES conversionTime) {
+    private void setShuntVoltageConversionTime(CONVERSION_TIMES conversionTime) {
         setConfiguration(conversionTime.ordinal() << 3);
     }
 
-    public void setMode(MODES mode) {
+    private void setMode(MODES mode) {
         setConfiguration(mode.value);
     }
 
-    private double getShuntVoltage(CHANNEL channel) {
-        RegisterMaps reg;
-
-        switch(channel) {
-            case CHANNEL_1:
-                reg = RegisterMaps.SHUNT_VOLTAGE_CH1;
-                break;
-            case CHANNEL_2:
-                reg = RegisterMaps.SHUNT_VOLTAGE_CH2;
-                break;
-            case CHANNEL_3:
-                reg = RegisterMaps.SHUNT_VOLTAGE_CH3;
-                break;
-            default:
-                return 0.0;
-        }
-
-        return (readInt(reg) >> 3) * 40e-6;
+    public boolean isClose(CHANNEL channel) {
+        return (getCurrent(channel) >= currentLimit[channel.ordinal()]);
     }
 
     public double getBusVoltage(CHANNEL channel) {
@@ -187,7 +172,36 @@ public class  INA3221 extends I2cDeviceSynchDevice<I2cDeviceSynchSimple> {
     public double getCurrent(CHANNEL channel) {
         double shuntVoltage = getShuntVoltage(channel);
 
-        return shuntVoltage / shuntResistors[channel.ordinal()];
+        return shuntVoltage / SHUNT_RESISTORS[channel.ordinal()];
+    }
+
+    public void setCurrentLimit(CHANNEL channel, double currentLimit) {
+        this.currentLimit[channel.ordinal()] = currentLimit;
+    }
+
+    public double getCurrentLimit(CHANNEL channel)
+    {
+        return currentLimit[channel.ordinal()];
+    }
+
+    private double getShuntVoltage(CHANNEL channel) {
+        RegisterMaps reg;
+
+        switch(channel) {
+            case CHANNEL_1:
+                reg = RegisterMaps.SHUNT_VOLTAGE_CH1;
+                break;
+            case CHANNEL_2:
+                reg = RegisterMaps.SHUNT_VOLTAGE_CH2;
+                break;
+            case CHANNEL_3:
+                reg = RegisterMaps.SHUNT_VOLTAGE_CH3;
+                break;
+            default:
+                return 0.0;
+        }
+
+        return (readInt(reg) >> 3) * 40e-6;
     }
 
     private int getConfiguration() {
